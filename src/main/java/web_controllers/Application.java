@@ -1,5 +1,6 @@
 package web_controllers;
 
+import database.DatabaseConnector;
 import entities.documents.Document;
 import entities.documents.Incoming;
 import entities.documents.Outgoing;
@@ -9,6 +10,7 @@ import utils.DocumentFactory;
 
 import javax.ws.rs.ApplicationPath;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +56,7 @@ public class Application extends javax.ws.rs.core.Application {
         add(Outgoing.class);
     }};
 
-    public Application() throws IOException {
+    public Application() throws IOException, SQLException {
         personRepository = new PersonRepository();
         documents = new ArrayList<>();
         documentFactory  = new DocumentFactory(texts, personRepository.getPersonList(), deliveryMethods);
@@ -62,6 +64,10 @@ public class Application extends javax.ws.rs.core.Application {
             int index = (int) (Math.random() * 3);
             documents.add(documentFactory.createDocument(classes.get(index)));
         }
+
+        DatabaseConnector databaseConnector = new DatabaseConnector();
+        databaseConnector.addPerson();
+        databaseConnector.addOrganizations();
     }
 
 }
