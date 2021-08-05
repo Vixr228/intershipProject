@@ -23,7 +23,7 @@ public class PersonRepository {
         try {
             personList = xmlParser.parsePersons(PERSONS_XML_PATH);
         } catch (Exception e) {
-            log.severe("getEmployeeList - Проблема при парсинге работников из XML файла");
+            log.severe("Проблема при парсинге работников из XML файла");
             e.printStackTrace();
         }
     }

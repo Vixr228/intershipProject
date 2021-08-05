@@ -2,10 +2,12 @@ package utils.parse_utils.adapters;
 
 import entities.orgstuff.Organization;
 import entities.orgstuff.Person;
+import repositories.PersonRepository;
 import utils.parse_utils.OrganizationList;
 import utils.parse_utils.PhoneNumbersList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import web_controllers.Application;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -26,6 +28,7 @@ public class OrganizationAdapter extends XmlAdapter<OrganizationAdapter.AdaptedO
      */
     public static Logger logger = LogManager.getRootLogger();
     OrganizationList organizationList;
+    List<Person> personList = Application.personRepository.getPersonList();
 
 
     public OrganizationAdapter(OrganizationList organizationList){
@@ -78,7 +81,6 @@ public class OrganizationAdapter extends XmlAdapter<OrganizationAdapter.AdaptedO
         }
 
         public PhoneNumbersList getContactList(){
-            //return contactList.getNumberList();
             return contactList;
         }
 
@@ -91,7 +93,22 @@ public class OrganizationAdapter extends XmlAdapter<OrganizationAdapter.AdaptedO
 
     @Override
     public Organization unmarshal(AdaptedOrganization v) throws Exception {
+
+        if(!personList.contains(v.getDirector())){
+            logger.error(v.getDirector() + " - Такого работника не существует");
+            throw new IllegalArgumentException("There is no such person in the company");
+        }
+        for(Person person : personList) {
+            if(person.equals(v.getDirector())){
+                System.out.println(person.getId() + " " + person);
+                v.setDirector(person);
+                v.getDirector().setId(person.getId());
+                break;
+            }
+        }
+
         return new Organization(v.getFullName(), v.getShortName(), v.getDirector(), v.getContactList());
+
     }
 
     @Override

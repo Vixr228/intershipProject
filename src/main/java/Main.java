@@ -35,14 +35,18 @@ public class Main {
 
         personList.forEach(person -> {
             logger.info(person.toString());
+            System.out.println(person.getId() + " " + person);
         });
 
         organizationList.forEach(organization -> {
             logger.info(organization.toString());
+            System.out.println(organization.getDirector().getId() + " " +organization.getDirector());
         });
         departmentList.forEach(department -> {
             logger.info(department.toString());
         });
+
+
 
         List<String> texts = new ArrayList<String>(){{
            add("Купить хлеб");

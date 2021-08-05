@@ -6,6 +6,7 @@ import utils.parse_utils.DepartmentList;
 import utils.parse_utils.PhoneNumbersList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import web_controllers.Application;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -26,6 +27,7 @@ public class DepartmentAdapter extends XmlAdapter<DepartmentAdapter.AdaptedDepar
      */
     public static Logger logger = LogManager.getRootLogger();
     DepartmentList departments;
+    List<Person> personList = Application.personRepository.getPersonList();
     public DepartmentAdapter(DepartmentList departmentList){
         this.departments = departmentList;
     }
@@ -88,6 +90,18 @@ public class DepartmentAdapter extends XmlAdapter<DepartmentAdapter.AdaptedDepar
 
     @Override
     public Department unmarshal(AdaptedDepartment v) throws Exception {
+        if(!personList.contains(v.getDirector())){
+            logger.error(v.getDirector() + " - Такого подразделения не существует");
+            throw new IllegalArgumentException("There is no such person in the company");
+        }
+        for(Person person : personList) {
+            if(person.equals(v.getDirector())){
+                System.out.println(person.getId() + " " + person);
+                v.setDirector(person);
+                v.getDirector().setId(person.getId());
+                break;
+            }
+        }
         return new Department(v.getFullName(), v.getShortName(), v.getDirector(), v.getContactList());
     }
 
