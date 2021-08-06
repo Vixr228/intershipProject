@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 public class OrganizationService extends DatabaseConnector implements OrganizationDAO{
     Connection connection = getConnection();
+    //TODO Добавить логгирование
     private Logger log = Logger.getLogger(getClass().getName());
     NumberService numberService = new NumberService();
     PersonService personService = new PersonService();
