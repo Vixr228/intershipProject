@@ -1,10 +1,14 @@
 package web_controllers;
 
 import database.DatabaseConnector;
+import database.OrganizationService;
+import database.PersonService;
+import entities.PhoneNumber;
 import entities.documents.Document;
 import entities.documents.Incoming;
 import entities.documents.Outgoing;
 import entities.documents.Task;
+import entities.orgstuff.Organization;
 import entities.orgstuff.Person;
 import repositories.DepartmentRepository;
 import repositories.OrganizationRepository;
@@ -16,6 +20,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -75,19 +80,23 @@ public class Application extends javax.ws.rs.core.Application {
         }
 
 
-//        personRepository.getPersonList().forEach(person -> {
-//            log.severe("PERSON: " + person.getId() + " " + person);
-//        });
-//
-//        organizationRepository.getOrganizationList().forEach(organization -> {
-//            log.severe("ORG: " + organization.getDirector().getId() + " " + organization.getDirector());
-//        });
+        PersonService personService = new PersonService();
+        OrganizationService organizationService = new OrganizationService();
+//        personService.addList(Application.personRepository.getPersonList());
+//        organizationService.addList(Application.organizationRepository.getOrganizationList());
 
-        DatabaseConnector databaseConnector = new DatabaseConnector();
-        databaseConnector.addPerson();
-        databaseConnector.addOrganizations();
-        databaseConnector.addDepartment();
-        databaseConnector.fetchPersonList();
+        List<Organization> organizationList = organizationService.getAll();
+        for(Organization org : organizationList){
+            log.severe(org.toString());
+        }
+
+        Organization prg = organizationList.get(0);
+        prg.setFullName("BLABLAs");
+        prg.setShortName("BUBU");
+        organizationService.update(prg);
+        log.severe(organizationService.getById(prg.getId()).toString());
+        organizationService.remove(prg);
+
     }
 
 }
