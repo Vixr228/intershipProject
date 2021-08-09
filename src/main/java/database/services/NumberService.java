@@ -1,7 +1,8 @@
-package database;
+package database.services;
 
+import database.DatabaseConnector;
+import database.interfaces.NumberDAO;
 import entities.PhoneNumber;
-import entities.orgstuff.Person;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,10 +10,19 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class NumberService extends DatabaseConnector implements NumberDAO{
+/**
+ * Класс который осущевствляет доступ к базе данных номеров.
+ */
+public class NumberService extends DatabaseConnector implements NumberDAO {
     Connection connection = getConnection();
     private Logger log = Logger.getLogger(getClass().getName());
 
+    /**
+     * Добавление номера
+     * @param id - id сущности, чей номер добавляем
+     * @param number
+     * @throws SQLException
+     */
     @Override
     public void add(UUID id, String number) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -26,6 +36,7 @@ public class NumberService extends DatabaseConnector implements NumberDAO{
 
             preparedStatement.executeUpdate();
         } catch (SQLException ex){
+            log.severe("Возникла проблема при добавление номера в БД");
             ex.printStackTrace();
         } finally {
             if(preparedStatement != null){
@@ -34,29 +45,12 @@ public class NumberService extends DatabaseConnector implements NumberDAO{
         }
     }
 
-    public void addList(UUID id, List<PhoneNumber> numberList) throws SQLException {
-        PreparedStatement preparedStatement = null;
-
-        String sql = "INSERT INTO APP.NUMBERS(ID, NUMBER) VALUES(?, ?)";
-
-        for(PhoneNumber number : numberList) {
-            try {
-                preparedStatement = connection.prepareStatement(sql);
-                preparedStatement.setString(1, id.toString());
-                preparedStatement.setString(2, number.getNumber());
-
-                preparedStatement.executeUpdate();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            } finally {
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
-            }
-        }
-    }
-
-
+    /**
+     * Получение всех номеров привязнных к id
+     * @param id
+     * @return
+     * @throws SQLException
+     */
     public List<PhoneNumber> getAllWithId(UUID id) throws SQLException {
         List<PhoneNumber> phoneNumberList = new ArrayList<>();
         PreparedStatement preparedStatement = null;
@@ -71,6 +65,7 @@ public class NumberService extends DatabaseConnector implements NumberDAO{
                 phoneNumberList.add(new PhoneNumber(resultSet.getString("number")));
             }
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при добавление номеров в БД");
             throwable.printStackTrace();
         } finally {
             if(preparedStatement != null){
@@ -81,6 +76,12 @@ public class NumberService extends DatabaseConnector implements NumberDAO{
         return phoneNumberList;
     }
 
+    /**
+     * Получение одного номера по id
+     * @param id
+     * @return
+     * @throws SQLException
+     */
     @Override
     public PhoneNumber getById(UUID id) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -110,6 +111,11 @@ public class NumberService extends DatabaseConnector implements NumberDAO{
         return phoneNumber;
     }
 
+    /**
+     * Удаление номера по id
+     * @param id
+     * @throws SQLException
+     */
     @Override
     public void removeByID(UUID id) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -121,6 +127,7 @@ public class NumberService extends DatabaseConnector implements NumberDAO{
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при удаление номера из БД");
             throwable.printStackTrace();
         } finally {
             if(preparedStatement != null){
@@ -129,6 +136,12 @@ public class NumberService extends DatabaseConnector implements NumberDAO{
         }
     }
 
+    /**
+     * Обновление номера одной из сущности
+     * @param id
+     * @param number
+     * @throws SQLException
+     */
     @Override
     public void update(UUID id, String number) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -141,6 +154,7 @@ public class NumberService extends DatabaseConnector implements NumberDAO{
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при обновление номера в БД");
             throwable.printStackTrace();
         } finally {
             if(preparedStatement != null){
@@ -149,6 +163,12 @@ public class NumberService extends DatabaseConnector implements NumberDAO{
         }
     }
 
+    /**
+     * Обновление нескольких номеров
+     * @param id
+     * @param phoneNumberList
+     * @throws SQLException
+     */
     public void updateList(UUID id, List<PhoneNumber> phoneNumberList) throws SQLException {
         PreparedStatement preparedStatement = null;
         String sql = "UPDATE APP.NUMBERS SET NUMBER=? WHERE ID=?";
@@ -161,6 +181,7 @@ public class NumberService extends DatabaseConnector implements NumberDAO{
 
                 preparedStatement.executeUpdate();
             } catch (SQLException throwable) {
+                log.severe("Возникла проблема при обновление номеров в БД");
                 throwable.printStackTrace();
             } finally {
                 if(preparedStatement != null){

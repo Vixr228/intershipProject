@@ -28,7 +28,7 @@ public class OrganizationAdapter extends XmlAdapter<OrganizationAdapter.AdaptedO
      */
     public static Logger logger = LogManager.getRootLogger();
     OrganizationList organizationList;
-    List<Person> personList = Application.personRepository.getPersonList();
+    List<Person> personList = Application.personRepository.getPersonListFromXML();
 
 
     public OrganizationAdapter(OrganizationList organizationList){

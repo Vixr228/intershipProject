@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-public class Task extends Document implements XMLConverter {
+public class Task extends Document {
     private Date taskDate;
     private Date taskDeadline;
     private Person taskExecutor;

@@ -1,4 +1,4 @@
-package database;
+package database.interfaces;
 
 import entities.documents.Document;
 

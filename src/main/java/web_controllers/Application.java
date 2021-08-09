@@ -1,15 +1,13 @@
 package web_controllers;
 
 import database.DatabaseConnector;
-import database.OrganizationService;
-import database.PersonService;
-import entities.PhoneNumber;
+import database.services.DepartmentService;
+import database.services.OrganizationService;
+import database.services.PersonService;
 import entities.documents.Document;
 import entities.documents.Incoming;
 import entities.documents.Outgoing;
 import entities.documents.Task;
-import entities.orgstuff.Organization;
-import entities.orgstuff.Person;
 import repositories.DepartmentRepository;
 import repositories.OrganizationRepository;
 import repositories.PersonRepository;
@@ -20,7 +18,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -38,6 +35,10 @@ public class Application extends javax.ws.rs.core.Application {
     public static List<Document> documents;
     public static OrganizationRepository organizationRepository;
     public static DepartmentRepository departmentRepository;
+    public static PersonService personService;
+    public static  OrganizationService organizationService;
+    public static  DepartmentService departmentService;
+    DatabaseConnector databaseConnector = new DatabaseConnector();
     List<String> texts = new ArrayList<String>(){{
         add("Купить хлеб");
         add("Помыть машину");
@@ -68,35 +69,29 @@ public class Application extends javax.ws.rs.core.Application {
         add(Outgoing.class);
     }};
 
+    /**
+     * Инициализируем все данные. Парсим XML, заполняем БД из этих данных. Создаем документы.
+     * @throws IOException
+     * @throws SQLException
+     */
     public Application() throws IOException, SQLException {
+        personService = new PersonService();
+        organizationService = new OrganizationService();
+        departmentService = new DepartmentService();
+
         personRepository = new PersonRepository();
         organizationRepository = new OrganizationRepository();
         departmentRepository = new DepartmentRepository();
+
+        personService.addList(Application.personRepository.getPersonListFromXML());
+        organizationService.addList(Application.organizationRepository.getOrganizationListFromXML());
+        departmentService.addList(Application.departmentRepository.getDepartmentListFromXML());
+
         documents = new ArrayList<>();
-        documentFactory  = new DocumentFactory(texts, personRepository.getPersonList(), deliveryMethods);
+        documentFactory  = new DocumentFactory(texts, personService.getAll(), deliveryMethods);
         for(int i = 0; i < 10; i++){
             int index = (int) (Math.random() * 3);
             documents.add(documentFactory.createDocument(classes.get(index)));
         }
-
-
-        PersonService personService = new PersonService();
-        OrganizationService organizationService = new OrganizationService();
-//        personService.addList(Application.personRepository.getPersonList());
-//        organizationService.addList(Application.organizationRepository.getOrganizationList());
-
-        List<Organization> organizationList = organizationService.getAll();
-        for(Organization org : organizationList){
-            log.severe(org.toString());
-        }
-
-        Organization prg = organizationList.get(0);
-        prg.setFullName("BLABLAs");
-        prg.setShortName("BUBU");
-        organizationService.update(prg);
-        log.severe(organizationService.getById(prg.getId()).toString());
-        organizationService.remove(prg);
-
     }
-
 }

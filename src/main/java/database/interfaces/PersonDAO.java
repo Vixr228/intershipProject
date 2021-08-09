@@ -1,4 +1,4 @@
-package database;
+package database.interfaces;
 
 import entities.orgstuff.Person;
 
@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Основные функции для работы с БД у работников
+ */
 public interface PersonDAO {
 
     void addList(List<Person> personList) throws SQLException;

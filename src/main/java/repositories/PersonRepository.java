@@ -4,7 +4,11 @@ import entities.documents.Document;
 import entities.orgstuff.Person;
 import utils.XMLParser;
 import web_controllers.Application;
-import java.util.*;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -32,13 +36,14 @@ public class PersonRepository {
      * Возвращает список всех работникок
      * @return List<Person>
      */
-    public List<Person> getPersonList() {
+    public List<Person> getPersonListFromXML() {
         return personList;
     }
 
-    public Person getPersonById(UUID id) {
+
+    public Person getPersonById(UUID id) throws SQLException {
         Person person = null;
-        for (Person p : personList) {
+        for (Person p : Application.personService.getAll()) {
             if (p.getId().equals(id)) {
                 person = p;
                 break;
@@ -52,10 +57,10 @@ public class PersonRepository {
      * @param id - сотрудник, список документов которого нам нужен
      * @return List<Document> - список документов сотрудника
      */
-    public List<Document> getDocumentReportById(UUID id){
+    public List<Document> getDocumentReportByAuthorId(UUID id) throws SQLException {
         List<Document> documentReport = null;
         Map<Person, List<Document>> map = Application.documents.stream().collect(Collectors.groupingBy(Document::getAuthor));
-        Person person = getPersonById(id);
+        Person person = Application.personRepository.getPersonById(id);
         if(person != null){
             if(map.containsKey(person)){
                 documentReport = map.get(person);

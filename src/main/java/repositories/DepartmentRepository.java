@@ -1,9 +1,10 @@
 package repositories;
 
 import entities.orgstuff.Department;
-import entities.orgstuff.Organization;
 import utils.XMLParser;
+import web_controllers.Application;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -28,13 +29,13 @@ public class DepartmentRepository {
      * Возвращает список все организации
      * @return List<Organization>
      */
-    public List<Department> getDepartmentList() {
+    public List<Department> getDepartmentListFromXML() {
         return departmentList;
     }
 
-    public Department getDepartmentById(UUID id) {
+    public Department getDepartmentById(UUID id) throws SQLException {
         Department department = null;
-        for (Department d : departmentList) {
+        for (Department d : Application.departmentService.getAll()) {
             if (d.getId().equals(id)) {
                 department = d;
                 break;

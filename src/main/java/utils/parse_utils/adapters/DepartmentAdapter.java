@@ -27,7 +27,7 @@ public class DepartmentAdapter extends XmlAdapter<DepartmentAdapter.AdaptedDepar
      */
     public static Logger logger = LogManager.getRootLogger();
     DepartmentList departments;
-    List<Person> personList = Application.personRepository.getPersonList();
+    List<Person> personList = Application.personRepository.getPersonListFromXML();
     public DepartmentAdapter(DepartmentList departmentList){
         this.departments = departmentList;
     }

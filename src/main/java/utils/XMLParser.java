@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -40,7 +41,7 @@ public class XMLParser {
 
         return personAdapter.adaptedPersonsToPersons();
     }
-    public List<Department> parseDepartments(String path) throws JAXBException {
+    public List<Department> parseDepartments(String path) throws JAXBException, SQLException {
         JAXBContext context = JAXBContext.newInstance(DepartmentList.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         DepartmentList departmentList = (DepartmentList) unmarshaller.unmarshal(new File(path));
@@ -50,7 +51,7 @@ public class XMLParser {
         return departmentAdapter.adaptedDepartmentsToDepartments();
     }
 
-    public List<Organization> parseOrganizations(String path) throws JAXBException {
+    public List<Organization> parseOrganizations(String path) throws JAXBException, SQLException {
         JAXBContext context = JAXBContext.newInstance(OrganizationList.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         OrganizationList organizationList = (OrganizationList) unmarshaller.unmarshal(new File(path));

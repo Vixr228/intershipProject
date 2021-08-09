@@ -1,7 +1,9 @@
-package database;
+package database.services;
 
+import database.DatabaseConnector;
+import database.interfaces.OrganizationDAO;
+import entities.PhoneNumber;
 import entities.orgstuff.Organization;
-import entities.orgstuff.Person;
 import utils.parse_utils.PhoneNumbersList;
 
 import java.sql.*;
@@ -10,13 +12,21 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class OrganizationService extends DatabaseConnector implements OrganizationDAO{
+/**
+ * Класс который осущесвляет работу с базой организаций
+ */
+public class OrganizationService extends DatabaseConnector implements OrganizationDAO {
     Connection connection = getConnection();
     //TODO Добавить логгирование
     private Logger log = Logger.getLogger(getClass().getName());
     NumberService numberService = new NumberService();
     PersonService personService = new PersonService();
 
+    /**
+     * Добавляет коллекцию организаций в базу данных
+     * @param organizationList
+     * @throws SQLException
+     */
     @Override
     public void addList(List<Organization> organizationList) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -30,24 +40,27 @@ public class OrganizationService extends DatabaseConnector implements Organizati
                 preparedStatement.setString(3, organization.getShortName());
                 preparedStatement.setString(4, organization.getDirector().getId().toString());
 
-                numberService.addList(organization.getId(), organization.getContactList().getNumberList());
+                for(PhoneNumber phoneNumber : organization.getContactList().getNumberList()){
+                    numberService.add(organization.getId(), phoneNumber.getNumber());
+                }
 
                 preparedStatement.executeUpdate();
 
             } catch (SQLException ex) {
-                log.severe("");
+                log.severe("Возникла проблема при добавление организаций в БД");
                 ex.printStackTrace();
             }
         }
         if(preparedStatement != null){
             preparedStatement.close();
         }
-//        if(connection != null) {
-//            connection.close();
-//        }
-
     }
 
+    /**
+     * Добавляет одну организацию в БД
+     * @param organization
+     * @throws SQLException
+     */
     @Override
     public void add(Organization organization) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -60,23 +73,27 @@ public class OrganizationService extends DatabaseConnector implements Organizati
             preparedStatement.setString(3, organization.getShortName());
             preparedStatement.setString(4, organization.getDirector().getId().toString());
 
-            numberService.addList(organization.getId(), organization.getContactList().getNumberList());
+            for(PhoneNumber phoneNumber : organization.getContactList().getNumberList()){
+                numberService.add(organization.getId(), phoneNumber.getNumber());
+            }
 
             preparedStatement.executeUpdate();
 
         } catch (SQLException ex) {
-            log.severe("");
+            log.severe("Возникла проблема при добавление организации в БД");
             ex.printStackTrace();
         } finally {
             if(preparedStatement != null){
                 preparedStatement.close();
             }
-//            if(connection != null) {
-//                connection.close();
-//            }
         }
     }
 
+    /**
+     * Получение всех организаций из БД
+     * @return
+     * @throws SQLException
+     */
     @Override
     public List<Organization> getAll() throws SQLException {
         List<Organization> organizationList = new ArrayList<>();
@@ -101,21 +118,23 @@ public class OrganizationService extends DatabaseConnector implements Organizati
             }
 
         } catch (SQLException ex){
-            log.severe("");
+            log.severe("Возникла проблема при получение организаций из БД");
             ex.printStackTrace();
         } finally {
             if(statement != null){
                 statement.close();
             }
-            //TODO Понять когда закрывтаь connection, потому что если вызывать несколько методов, то оно закрывается и все.
-//            if(connection != null){
-//                connection.close();
-//            }
         }
         return organizationList;
 
     }
 
+    /**
+     * Получение организации по его id
+     * @param id
+     * @return
+     * @throws SQLException
+     */
     @Override
     public Organization getById(UUID id) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -137,6 +156,7 @@ public class OrganizationService extends DatabaseConnector implements Organizati
                 organization.setContactList(contactList);
             }
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при получение организации из БД");
             throwable.printStackTrace();
         } finally {
             if(preparedStatement != null){
@@ -147,6 +167,11 @@ public class OrganizationService extends DatabaseConnector implements Organizati
         return organization;
     }
 
+    /**
+     * Обновление организации в БД
+     * @param organization
+     * @throws SQLException
+     */
     @Override
     public void update(Organization organization) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -163,6 +188,7 @@ public class OrganizationService extends DatabaseConnector implements Organizati
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при обновление организации в БД");
             throwable.printStackTrace();
         } finally {
             if(preparedStatement != null){
@@ -171,6 +197,11 @@ public class OrganizationService extends DatabaseConnector implements Organizati
         }
     }
 
+    /**
+     * Удаление организации из БД
+     * @param organization
+     * @throws SQLException
+     */
     @Override
     public void remove(Organization organization) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -181,7 +212,6 @@ public class OrganizationService extends DatabaseConnector implements Organizati
             preparedStatement = connection.prepareStatement(sql);
 
             preparedStatement.setString(1, organization.getId().toString());
-            //TODO методы с all в numberService исправить на такие циклы
             organization.getContactList().getNumberList().forEach(num -> {
                 try {
                     numberService.removeByID(organization.getId());
@@ -192,6 +222,7 @@ public class OrganizationService extends DatabaseConnector implements Organizati
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при удаление организации в БД");
             throwable.printStackTrace();
         } finally {
             if(preparedStatement != null){

@@ -1,15 +1,13 @@
 package database;
 
-import entities.orgstuff.Department;
-import entities.orgstuff.Organization;
-import entities.orgstuff.Person;
-import web_controllers.Application;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
+/**
+ * Класс устанавливает соединение с БД
+ */
 public class DatabaseConnector {
     private Logger log = Logger.getLogger(getClass().getName());
     private final String URL = "jdbc:derby:/Users/user/Desktop/database/db2;";

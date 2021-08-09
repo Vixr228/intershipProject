@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import utils.parse_utils.PhoneNumbersList;
 import javax.xml.bind.JAXBException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -130,7 +131,7 @@ class XMLParserTest {
      * @throws Exception
      */
     @Test
-    void parseDepartmentsShouldBeFalse() throws JAXBException {
+    void parseDepartmentsShouldBeFalse() throws JAXBException, SQLException {
         List<Department> departmentList = xmlParser.parseDepartments("src/main/resources/xml/testDepartmentList.xml");
         departmentList.forEach(department -> {
             assertNull(department.getFullName());
@@ -174,7 +175,7 @@ class XMLParserTest {
      * @throws Exception
      */
     @Test
-    void parseOrganizationsShouldBeFalse() throws JAXBException {
+    void parseOrganizationsShouldBeFalse() throws JAXBException, SQLException {
         List<Organization> organizationList = xmlParser.parseOrganizations("src/main/resources/xml/testOrganizationList.xml");
         organizationList.forEach(organization -> {
             assertNull(organization.getFullName());

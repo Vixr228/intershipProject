@@ -1,9 +1,10 @@
 package repositories;
 
 import entities.orgstuff.Organization;
-import entities.orgstuff.Person;
 import utils.XMLParser;
+import web_controllers.Application;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -28,13 +29,13 @@ public class OrganizationRepository {
      * Возвращает список все организации
      * @return List<Organization>
      */
-    public List<Organization> getOrganizationList() {
+    public List<Organization> getOrganizationListFromXML() {
         return organizationList;
     }
 
-    public Organization getOrganizationById(UUID id) {
+    public Organization getOrganizationById(UUID id) throws SQLException {
         Organization organization = null;
-        for (Organization o : organizationList) {
+        for (Organization o : Application.organizationService.getAll()) {
             if (o.getId().equals(id)) {
                 organization = o;
                 break;

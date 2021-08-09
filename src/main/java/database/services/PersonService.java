@@ -1,6 +1,7 @@
-package database;
+package database.services;
 
-import entities.PhoneNumber;
+import database.DatabaseConnector;
+import database.interfaces.PersonDAO;
 import entities.orgstuff.Person;
 
 import java.sql.*;
@@ -9,11 +10,20 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class PersonService extends DatabaseConnector implements PersonDAO{
+
+/**
+ * Класс который осущевствляет доступ к базе данных работников.
+ */
+public class PersonService extends DatabaseConnector implements PersonDAO {
     Connection connection = getConnection();
     private Logger log = Logger.getLogger(getClass().getName());
     NumberService numberService = new NumberService();
 
+    /**
+     * Добавляет коллекцию работников в базу данных
+     * @param personList
+     * @throws SQLException
+     */
     @Override
     public void addList(List<Person> personList) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -36,18 +46,20 @@ public class PersonService extends DatabaseConnector implements PersonDAO{
                 preparedStatement.executeUpdate();
 
             } catch (SQLException ex) {
-                log.severe("");
+                log.severe("Возникла проблема при добавление работников в БД");
                 ex.printStackTrace();
             }
         }
         if(preparedStatement != null){
             preparedStatement.close();
         }
-        if(connection != null) {
-            connection.close();
-        }
     }
 
+    /**
+     * Добавление одного работника в БД
+     * @param person
+     * @throws SQLException
+     */
     @Override
     public void add(Person person) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -67,18 +79,20 @@ public class PersonService extends DatabaseConnector implements PersonDAO{
             preparedStatement.executeUpdate();
 
         } catch (SQLException ex) {
-            log.severe("");
+            log.severe("Возникла проблема при добавление работника в БД");
             ex.printStackTrace();
         } finally {
             if(preparedStatement != null){
                 preparedStatement.close();
             }
-            if(connection != null) {
-                connection.close();
-            }
         }
     }
 
+    /**
+     * Получение списка работников из БД
+     * @return
+     * @throws SQLException
+     */
     @Override
     public List<Person> getAll() throws SQLException {
         List<Person> personList = new ArrayList<>();
@@ -104,20 +118,22 @@ public class PersonService extends DatabaseConnector implements PersonDAO{
             }
 
         } catch (SQLException ex){
-            log.severe("");
+            log.severe("Возникла проблема при получение работников из БД");
             ex.printStackTrace();
         } finally {
             if(statement != null){
                 statement.close();
             }
-            //TODO Понять когда закрывтаь connection, потому что если вызывать несколько методов, то оно закрывается и все.
-//            if(connection != null){
-//                connection.close();
-//            }
         }
         return personList;
     }
 
+    /**
+     * Получение работника по его id
+     * @param id
+     * @return
+     * @throws SQLException
+     */
     @Override
     public Person getById(UUID id) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -140,19 +156,22 @@ public class PersonService extends DatabaseConnector implements PersonDAO{
                 person.setPhoneNumber(numberService.getById(UUID.fromString(resultSet.getString("id"))));
             }
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при получение работника из БД");
            throwable.printStackTrace();
         } finally {
             if(preparedStatement != null){
                 preparedStatement.close();
             }
-//            if(connection != null){
-//                connection.close();
-//            }
         }
 
         return person;
     }
 
+    /**
+     * Обновление данных по работнику в БД
+     * @param person
+     * @throws SQLException
+     */
     @Override
     public void update(Person person) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -171,6 +190,7 @@ public class PersonService extends DatabaseConnector implements PersonDAO{
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при обновление работников в БД");
             throwable.printStackTrace();
         } finally {
             if(preparedStatement != null){
@@ -180,6 +200,11 @@ public class PersonService extends DatabaseConnector implements PersonDAO{
 
     }
 
+    /**
+     * Удаление работника из БД
+     * @param person
+     * @throws SQLException
+     */
     @Override
     public void remove(Person person) throws SQLException {
         PreparedStatement preparedStatement = null;
@@ -194,6 +219,7 @@ public class PersonService extends DatabaseConnector implements PersonDAO{
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при удаление работников из БД");
             throwable.printStackTrace();
         } finally {
             if(preparedStatement != null){
