@@ -34,14 +34,12 @@ public class OrganizationRepository {
     }
 
     public Organization getOrganizationById(UUID id) throws SQLException {
-        Organization organization = null;
         for (Organization o : Application.organizationService.getAll()) {
             if (o.getId().equals(id)) {
-                organization = o;
-                break;
+                return o;
             }
         }
-        return organization;
+        return null;
     }
 
 

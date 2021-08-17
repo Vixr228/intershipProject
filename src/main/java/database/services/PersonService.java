@@ -24,6 +24,9 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
     private Logger log = Logger.getLogger(getClass().getName());
     NumberService numberService = new NumberService();
 
+    public PersonService() throws Exception {
+    }
+
     /**
      * Добавляет коллекцию работников в базу данных
      * @param personList
@@ -31,14 +34,14 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
      */
     @Override
     public void addList(List<Person> personList) throws SQLException {
-        PreparedStatement preparedStatement = null;
 
 
-        String sql = "INSERT INTO APP.PERSONS(ID, NAME, SURNAME, PATRONYMIC, POSITION, BIRTH_DATE) VALUES(?, ?, ?, ?, ?, ?)";
+
+        String sql = "INSERT INTO APP.PERSONS(id, name, surname, patronymic, position , birth_date) VALUES(?, ?, ?, ?, ?, ?)";
 
         for(Person person : personList) {
-            try {
-                preparedStatement = connection.prepareStatement(sql);
+            try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
                 preparedStatement.setString(1, person.getId().toString());
                 preparedStatement.setString(2, person.getName());
                 preparedStatement.setString(3, person.getSurname());
@@ -55,9 +58,6 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
                 ex.printStackTrace();
             }
         }
-        if(preparedStatement != null){
-            preparedStatement.close();
-        }
     }
 
     /**
@@ -67,11 +67,10 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
      */
     @Override
     public void add(Person person) throws SQLException {
-        PreparedStatement preparedStatement = null;
 
-        String sqlPersons = "INSERT INTO APP.PERSONS(ID, NAME, SURNAME, PATRONYMIC, POSITION, BIRTH_DATE) VALUES(?, ?, ?, ?, ?, ?)";
-        try {
-            preparedStatement = connection.prepareStatement(sqlPersons);
+        String sql = "INSERT INTO APP.PERSONS(id, name, surname, patronymic, position, birth_date) VALUES(?, ?, ?, ?, ?, ?)";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
             preparedStatement.setString(1, person.getId().toString());
             preparedStatement.setString(2, person.getName());
             preparedStatement.setString(3, person.getSurname());
@@ -86,10 +85,6 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
         } catch (SQLException ex) {
             log.severe("Возникла проблема при добавление работника в БД");
             ex.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
     }
 
@@ -103,9 +98,8 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
         List<Person> personList = new ArrayList<>();
 
         String sql = "SELECT * FROM APP.PERSONS";
-        Statement statement = null;
-        try {
-            statement = connection.createStatement();
+
+        try(Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()){
@@ -125,11 +119,8 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
         } catch (SQLException ex){
             log.severe("Возникла проблема при получение работников из БД");
             ex.printStackTrace();
-        } finally {
-            if(statement != null){
-                statement.close();
-            }
         }
+
         return personList;
     }
 
@@ -141,12 +132,10 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
      */
     @Override
     public Person getById(UUID id) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "SELECT * FROM APP.PERSONS WHERE ID=?";
+        String sql = "SELECT * FROM APP.PERSONS WHERE id=?";
 
         Person person = new Person();
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             preparedStatement.setString(1, id.toString());
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -163,10 +152,6 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
         } catch (SQLException throwable) {
             log.severe("Возникла проблема при получение работника из БД");
            throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
 
         return person;
@@ -179,11 +164,9 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
      */
     @Override
     public void update(Person person) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "UPDATE APP.PERSONS SET NAME=?, SURNAME=?, PATRONYMIC=?, POSITION=?, BIRTH_DATE=? WHERE ID=?";
+        String sql = "UPDATE APP.PERSONS SET name=?, surname=?, patronymic=?, position =?, birth_date=? WHERE id=?";
 
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
             preparedStatement.setString(1, person.getName());
             preparedStatement.setString(2, person.getSurname());
@@ -197,12 +180,7 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
         } catch (SQLException throwable) {
             log.severe("Возникла проблема при обновление работников в БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
-
     }
 
     /**
@@ -212,12 +190,10 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
      */
     @Override
     public void remove(Person person) throws SQLException {
-        PreparedStatement preparedStatement = null;
 
-        String sql = "DELETE FROM APP.PERSONS WHERE ID=?";
+        String sql = "DELETE FROM APP.PERSONS WHERE id=?";
 
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
             preparedStatement.setString(1, person.getId().toString());
             numberService.removeByID(person.getId());
@@ -226,12 +202,6 @@ public class PersonService extends DatabaseConnector implements PersonDAO {
         } catch (SQLException throwable) {
             log.severe("Возникла проблема при удаление работников из БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
-
-
     }
 }

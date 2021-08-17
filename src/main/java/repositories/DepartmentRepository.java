@@ -34,13 +34,11 @@ public class DepartmentRepository {
     }
 
     public Department getDepartmentById(UUID id) throws SQLException {
-        Department department = null;
         for (Department d : Application.departmentService.getAll()) {
             if (d.getId().equals(id)) {
-                department = d;
-                break;
+               return d;
             }
         }
-        return department;
+        return null;
     }
 }

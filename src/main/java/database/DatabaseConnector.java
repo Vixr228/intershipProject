@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 public class DatabaseConnector {
     private Logger log = Logger.getLogger(getClass().getName());
     private final String URL = "jdbc:derby:/Users/user/Desktop/database/db2;";
-    public Connection getConnection(){
+    public Connection getConnection() throws Exception {
         Connection connection = null;
 
         try {
@@ -19,9 +19,9 @@ public class DatabaseConnector {
         } catch (SQLException throwable) {
             log.severe("Problem with connection to database");
             throwable.printStackTrace();
+            throw new Exception("Problem with connection");
         }
 
         return connection;
     }
-
 }

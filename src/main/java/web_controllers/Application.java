@@ -74,7 +74,7 @@ public class Application extends javax.ws.rs.core.Application {
      * @throws IOException
      * @throws SQLException
      */
-    public Application() throws IOException, SQLException {
+    public Application() throws Exception {
         personService = new PersonService();
         organizationService = new OrganizationService();
         departmentService = new DepartmentService();

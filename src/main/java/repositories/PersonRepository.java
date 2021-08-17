@@ -42,14 +42,12 @@ public class PersonRepository {
 
 
     public Person getPersonById(UUID id) throws SQLException {
-        Person person = null;
         for (Person p : Application.personService.getAll()) {
             if (p.getId().equals(id)) {
-                person = p;
-                break;
+                return p;
             }
         }
-        return person;
+        return null;
     }
 
     /**

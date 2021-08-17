@@ -21,6 +21,9 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
     Connection connection = getConnection();
     private Logger log = Logger.getLogger(getClass().getName());
 
+    public NumberService() throws Exception {
+    }
+
     /**
      * Добавление номера
      * @param id - id сущности, чей номер добавляем
@@ -29,12 +32,11 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
      */
     @Override
     public void add(UUID id, String number) throws SQLException {
-        PreparedStatement preparedStatement = null;
 
-        String sql = "INSERT INTO APP.NUMBERS(ID, NUMBER) VALUES(?, ?)";
 
-        try {
-            preparedStatement = connection.prepareStatement(sql);
+        String sql = "INSERT INTO APP.NUMBERS(id, number) VALUES(?, ?)";
+
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, id.toString());
             preparedStatement.setString(2, number);
 
@@ -42,10 +44,6 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
         } catch (SQLException ex){
             log.severe("Возникла проблема при добавление номера в БД");
             ex.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
     }
 
@@ -57,12 +55,10 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
      */
     public List<PhoneNumber> getAllWithId(UUID id) throws SQLException {
         List<PhoneNumber> phoneNumberList = new ArrayList<>();
-        PreparedStatement preparedStatement = null;
-        String sql = "SELECT * FROM APP.NUMBERS WHERE ID=?";
+               String sql = "SELECT * FROM APP.NUMBERS WHERE id=?";
 
-        try {
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, id.toString());
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                        preparedStatement.setString(1, id.toString());
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()){
@@ -71,12 +67,7 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
         } catch (SQLException throwable) {
             log.severe("Возникла проблема при добавление номеров в БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
-
         return phoneNumberList;
     }
 
@@ -88,12 +79,10 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
      */
     @Override
     public PhoneNumber getById(UUID id) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "SELECT * FROM APP.NUMBERS WHERE ID=?";
+                String sql = "SELECT * FROM APP.NUMBERS WHERE id=?";
 
         PhoneNumber phoneNumber = new PhoneNumber();
-        try {
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, id.toString());
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -106,10 +95,6 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
 
         } catch (SQLException throwable) {
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null) {
-                preparedStatement.close();
-            }
         }
 
         return phoneNumber;
@@ -122,21 +107,15 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
      */
     @Override
     public void removeByID(UUID id) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "DELETE FROM APP.NUMBERS WHERE ID=?";
+        String sql = "DELETE FROM APP.NUMBERS WHERE id=?";
 
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             preparedStatement.setString(1, id.toString());
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwable) {
             log.severe("Возникла проблема при удаление номера из БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
     }
 
@@ -148,11 +127,9 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
      */
     @Override
     public void update(UUID id, String number) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "UPDATE APP.NUMBERS SET NUMBER=? WHERE ID=?";
+        String sql = "UPDATE APP.NUMBERS SET number=? WHERE id=?";
 
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             preparedStatement.setString(1, number);
             preparedStatement.setString(2, id.toString());
 
@@ -160,10 +137,6 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
         } catch (SQLException throwable) {
             log.severe("Возникла проблема при обновление номера в БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
     }
 
@@ -174,12 +147,10 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
      * @throws SQLException
      */
     public void updateList(UUID id, List<PhoneNumber> phoneNumberList) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "UPDATE APP.NUMBERS SET NUMBER=? WHERE ID=?";
+        String sql = "UPDATE APP.NUMBERS SET number=? WHERE id=?";
 
         for(PhoneNumber number : phoneNumberList) {
-            try {
-                preparedStatement = connection.prepareStatement(sql);
+            try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setString(1, number.getNumber());
                 preparedStatement.setString(2, id.toString());
 
@@ -187,10 +158,6 @@ public class NumberService extends DatabaseConnector implements NumberDAO {
             } catch (SQLException throwable) {
                 log.severe("Возникла проблема при обновление номеров в БД");
                 throwable.printStackTrace();
-            } finally {
-                if(preparedStatement != null){
-                    preparedStatement.close();
-                }
             }
         }
     }

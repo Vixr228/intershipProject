@@ -22,10 +22,12 @@ import java.util.logging.Logger;
  */
 public class OrganizationService extends DatabaseConnector implements OrganizationDAO {
     Connection connection = getConnection();
-    //TODO Добавить логгирование
     private Logger log = Logger.getLogger(getClass().getName());
     NumberService numberService = new NumberService();
     PersonService personService = new PersonService();
+
+    public OrganizationService() throws Exception {
+    }
 
     /**
      * Добавляет коллекцию организаций в базу данных
@@ -34,12 +36,11 @@ public class OrganizationService extends DatabaseConnector implements Organizati
      */
     @Override
     public void addList(List<Organization> organizationList) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "INSERT INTO APP.ORGANIZATIONS(ID, FULL_NAME, SHORT_NAME, DIRECTOR_ID) VALUES(?, ?, ?, ?)";
+        String sql = "INSERT INTO APP.ORGANIZATIONS(id, full_name, short_name, director_id) VALUES(?, ?, ?, ?)";
 
         for(Organization organization : organizationList) {
-            try {
-                preparedStatement = connection.prepareStatement(sql);
+            try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
                 preparedStatement.setString(1, organization.getId().toString());
                 preparedStatement.setString(2, organization.getFullName());
                 preparedStatement.setString(3, organization.getShortName());
@@ -56,9 +57,6 @@ public class OrganizationService extends DatabaseConnector implements Organizati
                 ex.printStackTrace();
             }
         }
-        if(preparedStatement != null){
-            preparedStatement.close();
-        }
     }
 
     /**
@@ -68,11 +66,9 @@ public class OrganizationService extends DatabaseConnector implements Organizati
      */
     @Override
     public void add(Organization organization) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "INSERT INTO APP.ORGANIZATIONS(ID, FULL_NAME, SHORT_NAME, DIRECTOR_ID) VALUES(?, ?, ?, ?)";
+        String sql = "INSERT INTO APP.ORGANIZATIONS(id, full_name, short_name, director_id) VALUES(?, ?, ?, ?)";
 
-        try {
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, organization.getId().toString());
             preparedStatement.setString(2, organization.getFullName());
             preparedStatement.setString(3, organization.getShortName());
@@ -87,10 +83,6 @@ public class OrganizationService extends DatabaseConnector implements Organizati
         } catch (SQLException ex) {
             log.severe("Возникла проблема при добавление организации в БД");
             ex.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
     }
 
@@ -104,9 +96,9 @@ public class OrganizationService extends DatabaseConnector implements Organizati
         List<Organization> organizationList = new ArrayList<>();
 
         String sql = "SELECT * FROM APP.ORGANIZATIONS";
-        Statement statement = null;
-        try {
-            statement = connection.createStatement();
+
+        try(Statement statement = connection.createStatement()) {
+
             ResultSet resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()){
@@ -125,10 +117,6 @@ public class OrganizationService extends DatabaseConnector implements Organizati
         } catch (SQLException ex){
             log.severe("Возникла проблема при получение организаций из БД");
             ex.printStackTrace();
-        } finally {
-            if(statement != null){
-                statement.close();
-            }
         }
         return organizationList;
 
@@ -142,12 +130,11 @@ public class OrganizationService extends DatabaseConnector implements Organizati
      */
     @Override
     public Organization getById(UUID id) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "SELECT * FROM APP.ORGANIZATIONS WHERE ID=?";
+        String sql = "SELECT * FROM APP.ORGANIZATIONS WHERE id=?";
 
         Organization organization = new Organization();
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try( PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
             preparedStatement.setString(1, id.toString());
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -163,10 +150,6 @@ public class OrganizationService extends DatabaseConnector implements Organizati
         } catch (SQLException throwable) {
             log.severe("Возникла проблема при получение организации из БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
 
         return organization;
@@ -179,11 +162,9 @@ public class OrganizationService extends DatabaseConnector implements Organizati
      */
     @Override
     public void update(Organization organization) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "UPDATE APP.ORGANIZATIONS SET FULL_NAME=?, SHORT_NAME=?, DIRECTOR_ID=? WHERE ID=?";
+        String sql = "UPDATE APP.ORGANIZATIONS SET full_name=?, short_name=?, director_id=? WHERE id=?";
 
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
             preparedStatement.setString(1, organization.getFullName());
             preparedStatement.setString(2, organization.getShortName());
@@ -195,10 +176,6 @@ public class OrganizationService extends DatabaseConnector implements Organizati
         } catch (SQLException throwable) {
             log.severe("Возникла проблема при обновление организации в БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
     }
 
@@ -209,12 +186,10 @@ public class OrganizationService extends DatabaseConnector implements Organizati
      */
     @Override
     public void remove(Organization organization) throws SQLException {
-        PreparedStatement preparedStatement = null;
 
-        String sql = "DELETE FROM APP.ORGANIZATIONS WHERE ID=?";
+        String sql = "DELETE FROM APP.ORGANIZATIONS WHERE id=?";
 
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try( PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
             preparedStatement.setString(1, organization.getId().toString());
             organization.getContactList().getNumberList().forEach(num -> {
@@ -229,11 +204,6 @@ public class OrganizationService extends DatabaseConnector implements Organizati
         } catch (SQLException throwable) {
             log.severe("Возникла проблема при удаление организации в БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
-
     }
 }

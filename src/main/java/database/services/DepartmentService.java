@@ -26,6 +26,9 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
     NumberService numberService = new NumberService();
     PersonService personService = new PersonService();
 
+    public DepartmentService() throws Exception {
+    }
+
     /**
      * Добавление коллекции подразделений в БД
      * @param departmentList
@@ -33,12 +36,11 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
      */
     @Override
     public void addList(List<Department> departmentList) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "INSERT INTO APP.DEPARTMENTS(ID, FULL_NAME, SHORT_NAME, DIRECTOR_ID) VALUES(?, ?, ?, ?)";
+        String sql = "INSERT INTO APP.DEPARTMENTS(id, full_name, short_name, director_id) VALUES(?, ?, ?, ?)";
 
         for(Department department : departmentList) {
-            try {
-                preparedStatement = connection.prepareStatement(sql);
+            try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
                 preparedStatement.setString(1, department.getId().toString());
                 preparedStatement.setString(2, department.getFullName());
                 preparedStatement.setString(3, department.getShortName());
@@ -51,12 +53,9 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
                 preparedStatement.executeUpdate();
 
             } catch (SQLException ex) {
-                log.severe("");
+                log.severe("Возникла проблема при добавление подразделений в БД");
                 ex.printStackTrace();
             }
-        }
-        if(preparedStatement != null){
-            preparedStatement.close();
         }
     }
 
@@ -67,11 +66,11 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
      */
     @Override
     public void add(Department department) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "INSERT INTO APP.DEPARTMENTS(ID, FULL_NAME, SHORT_NAME, DIRECTOR_ID) VALUES(?, ?, ?, ?)";
 
-        try {
-            preparedStatement = connection.prepareStatement(sql);
+        String sql = "INSERT INTO APP.DEPARTMENTS(id, full_name, short_name, director_id) VALUES(?, ?, ?, ?)";
+
+        try( PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
             preparedStatement.setString(1, department.getId().toString());
             preparedStatement.setString(2, department.getFullName());
             preparedStatement.setString(3, department.getShortName());
@@ -84,12 +83,8 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
             preparedStatement.executeUpdate();
 
         } catch (SQLException ex) {
-            log.severe("");
+            log.severe("Возникла проблема при добавление подразделения в БД");
             ex.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
     }
 
@@ -103,9 +98,9 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
         List<Department> departmentList = new ArrayList<>();
 
         String sql = "SELECT * FROM APP.DEPARTMENTS";
-        Statement statement = null;
-        try {
-            statement = connection.createStatement();
+
+        try(Statement statement = connection.createStatement()) {
+
             ResultSet resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()){
@@ -122,12 +117,8 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
             }
 
         } catch (SQLException ex){
-            log.severe("");
+            log.severe("Возникла проблема при получении подразделений в БД");
             ex.printStackTrace();
-        } finally {
-            if(statement != null){
-                statement.close();
-            }
         }
         return departmentList;
 
@@ -141,12 +132,11 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
      */
     @Override
     public Department getById(UUID id) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "SELECT * FROM APP.DEPARTMENTS WHERE ID=?";
+        String sql = "SELECT * FROM APP.DEPARTMENTS WHERE id=?";
 
         Department department = new Department();
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
             preparedStatement.setString(1, id.toString());
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -160,11 +150,8 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
                 department.setContactList(contactList);
             }
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при получении подразделения по ID из БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
 
         return department;
@@ -177,11 +164,9 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
      */
     @Override
     public void update(Department department) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        String sql = "UPDATE APP.DEPARTMENTS SET FULL_NAME=?, SHORT_NAME=?, DIRECTOR_ID=? WHERE ID=?";
+        String sql = "UPDATE APP.DEPARTMENTS SET full_name=?, short_name=?, director_id=? WHERE id=?";
 
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
             preparedStatement.setString(1, department.getFullName());
             preparedStatement.setString(2, department.getShortName());
@@ -191,11 +176,8 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при обновлении подразделения в БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
     }
 
@@ -207,12 +189,10 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
     @Override
     public void remove(Department department) throws SQLException {
 
-        PreparedStatement preparedStatement = null;
 
-        String sql = "DELETE FROM APP.DEPARTMENTS WHERE ID=?";
+        String sql = "DELETE FROM APP.DEPARTMENTS WHERE id=?";
 
-        try{
-            preparedStatement = connection.prepareStatement(sql);
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
             preparedStatement.setString(1, department.getId().toString());
             department.getContactList().getNumberList().forEach(num -> {
@@ -225,11 +205,8 @@ public class DepartmentService extends DatabaseConnector implements DepartmentDA
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwable) {
+            log.severe("Возникла проблема при удаление подразделения из БД");
             throwable.printStackTrace();
-        } finally {
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
         }
     }
 }
